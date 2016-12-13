@@ -1,9 +1,7 @@
 #!/usr/bin/python
 import csv, sys
-
-#define eval items here
-#items = ["Lab1","Lab2","Lab3","Lab4","Lab5","Lab6"]
-items = []
+from subprocess import call
+from os import system
 
 #define group number of elements range(min,max+1) here
 groupr = range(1,4)
@@ -17,10 +15,22 @@ data = []
 agrupamentos = []
 
 ####################################################################
-def saveDB(filename):
+def printGrades(filename, items):
+    if not (set(items).issubset(data[0].keys())):
+        print 'Some items are not valid. Try again.'
+        return
     keys = ['N\xfamero', 'Nome']+agrupamentos+items
     with open(filename, 'wb') as f:
         writer = csv.DictWriter(f, keys, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(data)
+        f.close()
+
+####################################################################
+def saveDB(filename):
+    system('mv '+filename+' '+filename+'.bak')
+    with open(filename, 'wb') as f:
+        writer = csv.DictWriter(f, data[0].keys(), delimiter=';')
         writer.writeheader()
         writer.writerows(data)
         f.close()
@@ -59,13 +69,14 @@ def getGroupInfo(studentNumber):
 # ls student_number
 ####################################################################
 def listStudent(studentNumber):
-    return [item for item in data if item["N\xfamero"] == studentNumber]
+    return [student for student in data if student["N\xfamero"] == studentNumber]
 
 ####################################################################
 # ii item
 ####################################################################
 def insertItem(itemname):
-    items.append(itemname)
+    for student in data:
+        student[itemname]=''
 
 ####################################################################
 # isg item student_number grade
@@ -77,7 +88,7 @@ def insertStudentGrade (studentGrade):
         return 0
         
     item = studentGrade[0]
-    if not (item in items):
+    if not (item in data[0].keys()):
         print "\nERROR: Item does not exist\n"
         return 0
 
@@ -112,7 +123,7 @@ def insertGroupGrade (groupGrade):
     grade = groupGrade[2]
 
 
-    if not (item in items):
+    if not (item in data[0].keys()):
         print "\nERROR: Item does not exist\n"
         return 0
 
@@ -127,8 +138,12 @@ def insertGroupGrade (groupGrade):
     for student in student_list:
         student[item] = grade
 
+    return 1
 
 
+####################################################################
+# Main
+####################################################################
 def main () :
 
     if(len(sys.argv) != 2):
@@ -171,8 +186,10 @@ def main () :
                 print "Group grade inserted successfully\n"
             else:
                 print "Could not insert group grade\n"
+        elif cmd=='pg':
+            printGrades(filename+'_pg.csv', cmdline)
         elif cmd=='quit':
-            saveDB(filename+'_out.csv')
+            saveDB(filename+'.csv')
             sys.exit(0)
         else:
             print 'Command not found'
