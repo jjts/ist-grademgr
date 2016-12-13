@@ -18,15 +18,16 @@ agrupamentos = []
 
 ####################################################################
 def saveDB(filename):
-            keys = ['N\xfamero', 'Nome']+agrupamentos+items
-            with open(filename, 'wb') as f:
-                writer = csv.DictWriter(f, keys, extrasaction='ignore')
-                writer.writeheader()
-                writer.writerows(data)
-                f.close()
+    keys = ['N\xfamero', 'Nome']+agrupamentos+items
+    with open(filename, 'wb') as f:
+        writer = csv.DictWriter(f, keys, extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(data)
+        f.close()
 
 ####################################################################
 def loadDB(filename):
+    global agrupamentos
     with open(filename,  'r') as f:
         reader = csv.DictReader(f, delimiter=';')
         for line in reader:
@@ -41,11 +42,14 @@ def listGroupElements(agrupamento, groupname):
 ####################################################################
 def getGroupInfo(studentNumber):
     student = listStudent(studentNumber).pop(0)
+    print agrupamentos
     for agrupamento in agrupamentos:
+        agrup = agrupamento
         if student[agrupamento] != '':
+            print agrup
             break
     groupInfo = []
-    groupInfo.append(agrupamento)
+    groupInfo.append(agrup)
     groupInfo.append(student[agrupamento])
     return groupInfo
 
@@ -98,35 +102,31 @@ def insertStudentGrade (studentGrade):
 # igg item group_member grade
 ####################################################################
 def insertGroupGrade (groupGrade):
-            b = groupGrade
 
-            if len(b) != 3:
-                        print "\nERROR: Number of fields is not 3\n"
-                        return 0
+    if len(groupGrade) != 3:
+        print "\nERROR: Number of fields is not 3\n"
+        return 0
         
-            if not (b[0] in groups):
-                        print "\nERROR: Group does not exist\n"
-                        return 0
+    item = groupGrade[0]
+    group_member = groupGrade[1]
+    grade = groupGrade[2]
 
-            if not (b[1] in items):
-                        print "\nERROR: Item does not exist\n"
-                        return 0
 
-            if not (int(b[2]) in grader):
-                        print "\nERROR: Grade is not in the range "+str(min(grader))+" "+str(max(grader))+"\n"
-                        return 0
+    if not (item in items):
+        print "\nERROR: Item does not exist\n"
+        return 0
 
-            studentFound = 0;
-            for student in data:
-                        if student['Group'] == b[0]:
-                                    student[b[1]] = b[2]
-                                    studentFound = 1
+    if not (int(grade) in grader):
+        print "\nERROR: Grade is not in the range "+str(min(grader))+" "+str(max(grader))+"\n"
+        return 0
 
-            if studentFound == 0:
-                        print "\nERROR: Group empty or non-existing\n"
-                        return 0
+    agrupamento, group = getGroupInfo(group_member)
+    
+    student_list = [student for student in data if student[agrupamento] == group]
 
-            return 1
+    for student in student_list:
+        student[item] = grade
+
 
 
 def main () :
