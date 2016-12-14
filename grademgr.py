@@ -15,7 +15,7 @@ data = []
 agrupamentos = []
 
 ####################################################################
-def printGrades(filename, items):
+def printStudentGrades(filename, items):
     if not (set(items).issubset(data[0].keys())):
         print 'Some items are not valid. Try again.'
         return
@@ -24,6 +24,32 @@ def printGrades(filename, items):
         writer = csv.DictWriter(f, keys, extrasaction='ignore')
         writer.writeheader()
         writer.writerows(data)
+        f.close()
+
+####################################################################
+def printGroupGrades(filename,itemList):
+    groups = []
+    for student in data:
+        group = getGroupInfo(student["N\xfamero"])
+        if not(group in groups):
+            for item in itemList:
+                group.append(student[item])
+            groups.append(group)
+
+    groups.sort()
+
+    #create file header
+    header = "Agrupamento, Grupo, "
+    for i in range(0,len(itemList)-1):
+        header=header+itemList[i]+'; '
+    header=header+itemList[i+1]
+        
+    with open(filename, 'wb') as f:
+        f.write(header+'\n')
+        for group in groups:
+            for i in range(0,len(group)-1):
+                f.write(group[i]+'; ')
+            f.write(group[i+1]+'\n')
         f.close()
 
 ####################################################################
@@ -46,25 +72,19 @@ def loadDB(filename):
     agrupamentos = [s for s in data[0].keys() if "Agrup" in s]
 
 ####################################################################
-def listGroupElements(agrupamento, groupname):
-    return [item for item in data if item[agrupamento] == groupname]
-
-####################################################################
 def getGroupInfo(studentNumber):
     student = listStudent(studentNumber).pop(0)
     print agrupamentos
     for agrupamento in agrupamentos:
-        agrup = agrupamento
         if student[agrupamento] != '':
-            print agrup
             break
     groupInfo = []
-    groupInfo.append(agrup)
+    groupInfo.append(agrupamento)
     groupInfo.append(student[agrupamento])
     return groupInfo
 
 
-    
+      
 ####################################################################
 # ls student_number
 ####################################################################
@@ -74,9 +94,11 @@ def listStudent(studentNumber):
 ####################################################################
 # ii item
 ####################################################################
-def insertItem(itemname):
+def insertItems(itemList):
     for student in data:
-        student[itemname]=''
+        for item in itemList:
+            if not (item in student.keys()):
+                student[item]=''
 
 ####################################################################
 # isg item student_number grade
@@ -167,7 +189,9 @@ def main () :
         except:
             pass
 
-        if cmd=='ls':
+        if (cmd[0]=='#' or cmd=='NA'):
+            pass
+        elif cmd=='ls':
             student = listStudent(cmdline[0])
             if student:
                 print student.pop(0)
@@ -179,15 +203,17 @@ def main () :
             else:
                 print "Could not insert student grade\n"
         elif cmd=='ii':
-            insertItem(cmdline[0])
+            insertItems(cmdline)
         elif cmd=='igg':
             flag = insertGroupGrade(cmdline)
             if flag == 1:
                 print "Group grade inserted successfully\n"
             else:
                 print "Could not insert group grade\n"
-        elif cmd=='pg':
-            printGrades(filename+'_pg.csv', cmdline)
+        elif cmd=='psg':
+            printStudentGrades(filename+'_sg.csv', cmdline)
+        elif cmd=='pgg':
+            printGroupGrades(filename+'_gg.csv', cmdline)
         elif cmd=='quit':
             saveDB(filename+'.csv')
             sys.exit(0)
