@@ -40,9 +40,10 @@ def printGroupGrades(filename,itemList):
 
     #create file header
     header = "Agrupamento, Grupo, "
-    for i in range(0,len(itemList)-1):
-        header=header+itemList[i]+'; '
-    header=header+itemList[i+1]
+    if len(itemList)>0:
+        for i in range(0,len(itemList)-1):
+            header=header+itemList[i]+'; '
+        header=header+itemList[len(itemList)-1]
         
     with open(filename, 'wb') as f:
         f.write(header+'\n')
@@ -74,7 +75,6 @@ def loadDB(filename):
 ####################################################################
 def getGroupInfo(studentNumber):
     student = listStudent(studentNumber).pop(0)
-    print agrupamentos
     for agrupamento in agrupamentos:
         if student[agrupamento] != '':
             break
