@@ -28,12 +28,18 @@ def printStudentGrades(filename, items):
 
 ####################################################################
 def printGroupGrades(filename,itemList):
+    if not set(itemList).issubset(data[0].keys()):
+        print 'Item(s) not in key list'
+        return
+    
     groups = []
     for student in data:
         group = getGroupInfo(student["N\xfamero"])
+        if not group:
+            continue
+        for item in itemList:
+            group.append(student[item])
         if not(group in groups):
-            for item in itemList:
-                group.append(student[item])
             groups.append(group)
 
     groups.sort()
@@ -50,7 +56,7 @@ def printGroupGrades(filename,itemList):
         for group in groups:
             for i in range(0,len(group)-1):
                 f.write(group[i]+'; ')
-            f.write(group[i+1]+'\n')
+            f.write(group[len(group)-1]+'\n')
         f.close()
 
 ####################################################################
@@ -71,20 +77,22 @@ def loadDB(filename):
             data.append(line)
         f.close()
     agrupamentos = [s for s in data[0].keys() if "Agrup" in s]
+    agrupamentos.sort()
 
 ####################################################################
 def getGroupInfo(studentNumber):
     student = listStudent(studentNumber).pop(0)
-    for agrupamento in agrupamentos:
-        if student[agrupamento] != '':
-            break
     groupInfo = []
-    groupInfo.append(agrupamento)
-    groupInfo.append(student[agrupamento])
+    for agrupamento in agrupamentos:
+        try:
+            grpid= int(student[agrupamento])
+            groupInfo.append(agrupamento)
+            groupInfo.append(student[agrupamento])
+        except:
+            pass
+
     return groupInfo
 
-
-      
 ####################################################################
 # ls student_number
 ####################################################################
@@ -179,8 +187,9 @@ def main () :
     while 1:
         try:
             cmdline = raw_input("gm> ")
-        except:
-            continue
+        except EOFError:
+            print ''
+            break
 
         cmdline = cmdline.split()
         cmd = 'NA'
