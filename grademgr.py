@@ -48,14 +48,14 @@ def printGroupGrades(filename,itemList):
     header = "Agrupamento, Grupo, "
     if len(itemList)>0:
         for i in range(0,len(itemList)-1):
-            header=header+itemList[i]+'; '
+            header=header+itemList[i]+', '
         header=header+itemList[len(itemList)-1]
         
     with open(filename, 'wb') as f:
         f.write(header+'\n')
         for group in groups:
             for i in range(0,len(group)-1):
-                f.write(group[i]+'; ')
+                f.write(group[i]+', ')
             f.write(group[len(group)-1]+'\n')
         f.close()
 
