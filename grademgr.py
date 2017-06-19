@@ -61,8 +61,7 @@ def printGroupGrades(filename,itemList):
 
 ####################################################################
 def saveDB(filename):
-    system('mv '+filename+' '+filename+'.bak')
-    with open(filename, 'wb') as f:
+    with open(filename+'_filled.csv', 'wb') as f:
         writer = csv.DictWriter(f, data[0].keys(), delimiter=';')
         writer.writeheader()
         writer.writerows(data)
@@ -92,6 +91,7 @@ def getGroupInfo(studentNumber):
             pass
 
     return groupInfo
+
 
 ####################################################################
 # ls student_number
@@ -170,6 +170,28 @@ def insertGroupGrade (groupGrade):
 
     return 1
 
+def insertGroupGrade2 (groupGrade):
+
+    if len(groupGrade) != 3:
+        print "\nERROR: Number of fields is not 3\n"
+        return 0
+        
+    item = groupGrade[0]
+    group_number = groupGrade[1]
+    grade = groupGrade[2]
+
+
+    if not (item in data[0].keys()):
+        print "\nERROR: Item does not exist\n"
+        return 0
+
+    student_list = [student for student in data if student[agrupamentos[0]] == group_number]
+
+    for student in student_list:
+        student[item] = grade
+
+    return 1
+
 
 ####################################################################
 # Main
@@ -219,12 +241,18 @@ def main () :
                 print "Group grade inserted successfully\n"
             else:
                 print "Could not insert group grade\n"
+        elif cmd=='igg2':
+            flag = insertGroupGrade2(cmdline)
+            if flag == 1:
+                print "Group grade inserted successfully\n"
+            else:
+                print "Could not insert group grade\n"
         elif cmd=='psg':
             printStudentGrades(filename+'_sg.csv', cmdline)
         elif cmd=='pgg':
             printGroupGrades(filename+'_gg.csv', cmdline)
         elif cmd=='quit':
-            saveDB(filename+'.csv')
+            saveDB(filename)
             sys.exit(0)
         else:
             print 'Command not found'
