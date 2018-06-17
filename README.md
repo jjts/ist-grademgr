@@ -12,22 +12,21 @@ Written by Jose T. de Sousa (jts@inesc-id.pt)
 
 ### Individual student grades file format
 
-    	    Number,		EvalItem1, ...,		EvalItemN
-	    [student number]	[EvalItem1 grade]	[EvalItemN grade]
-	    ...	     		...	   		...
-	    [student number]	[EvalItem1 grade]	[EvalItemN grade]
+    Number,             EvalItem1, ...,         EvalItemN
+    [student number]    [EvalItem1 grade]       [EvalItemN grade]
+    ...                 ...                     ...
+    [student number]    [EvalItem1 grade]       [EvalItemN grade]
 
-	    * Rows do not need to be ordered
-
+    * Rows do not need to be ordered
 
 ### Group grades file format
 
-    	    Number,		EvalItem1, ...,		EvalItemN
-	    [group number]	[EvalItem1 grade]	[EvalItemN grade]
-	    ...	     		...	   		...
-	    [group number]	[EvalItem1 grade]	[EvalItemN grade]
+    Number,             EvalItem1, ...,         EvalItemN
+    [group number]      [EvalItem1 grade]       [EvalItemN grade]
+    ...                 ...                     ...
+    [group number]      [EvalItem1 grade]       [EvalItemN grade]
 
-	    * Rows do not need to be ordered
+    * Rows do not need to be ordered
 
 
 ## Run the program to generate a database
@@ -41,14 +40,14 @@ This creates a database stored in file sdb.csv, containing the students' number,
 
 $ grademgr --insert_s your_students_grades.csv
 
-The new evaluation items in your_students_grades.csv will be added to sdb.csv. Grades for existing items will be updated.
+The new evaluation items and grades in your_students_grades.csv will be inserted to sdb.csv. Grades for existing items will be updated.
 
 
 ## Run the program to insert group grades
 
 $ grademgr --insert_g your_groups_grades.csv
 
-The new evaluation items in your_students_grades.csv will be added to sdb.csv. Grades for existing items will be updated.
+The new evaluation items and graded in your_students_grades.csv will be inserted to sdb.csv. Grades for existing items will be updated.
 
 
 * Enjoy and feel free to comment, fix, upgrade, etc.
