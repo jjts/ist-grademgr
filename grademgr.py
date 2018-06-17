@@ -10,252 +10,173 @@ groupr = range(1,4)
 grader = range(0,21)
 
 
-#global variables 
-data = []
-agrupamentos = []
+#global variable
+database = []
+eval_items = []
 
-####################################################################
-def printStudentGrades(filename, items):
-    if not (set(items).issubset(data[0].keys())):
-        print 'Some items are not valid. Try again.'
-        return
-    keys = ['N\xfamero', 'Nome']+agrupamentos+items
-    with open(filename, 'wb') as f:
-        writer = csv.DictWriter(f, keys, extrasaction='ignore')
+#
+# Find index in dict
+#
+def find_index(dicts, key, value):
+    class Null: pass
+    for i, d in enumerate(dicts):
+        if d.get(key, Null) == value:
+            return i
+    else:
+        raise ValueError('no dict with the key and value combination found')
+
+
+#
+# Save database
+#
+def saveDB():
+
+    global eval_items
+
+    with open('sdb.csv', 'wb') as f:
+        writer = csv.DictWriter(f, ['Number', 'Name', 'Group']+eval_items, delimiter=',')
         writer.writeheader()
-        writer.writerows(data)
+        writer.writerows(database)
         f.close()
 
-####################################################################
-def printGroupGrades(filename,itemList):
-    if not set(itemList).issubset(data[0].keys()):
-        print 'Item(s) not in key list'
-        return
+
+#
+# Create database
+#
+def createDB(filename):
+
+    global database
     
-    groups = []
-    for student in data:
-        group = getGroupInfo(student["N\xfamero"])
-        if not group:
-            continue
-        for item in itemList:
-            group.append(student[item])
-        if not(group in groups):
-            groups.append(group)
-
-    groups.sort()
-
-    #create file header
-    header = "Agrupamento, Grupo, "
-    if len(itemList)>0:
-        for i in range(0,len(itemList)-1):
-            header=header+itemList[i]+', '
-        header=header+itemList[len(itemList)-1]
-        
-    with open(filename, 'wb') as f:
-        f.write(header+'\n')
-        for group in groups:
-            for i in range(0,len(group)-1):
-                f.write(group[i]+', ')
-            f.write(group[len(group)-1]+'\n')
-        f.close()
-
-####################################################################
-def saveDB(filename):
-    with open(filename+'_filled.csv', 'wb') as f:
-        writer = csv.DictWriter(f, data[0].keys(), delimiter=';')
-        writer.writeheader()
-        writer.writerows(data)
-        f.close()
-
-####################################################################
-def loadDB(filename):
-    global agrupamentos
+    # read students file into dict
     with open(filename,  'r') as f:
-        reader = csv.DictReader(f, delimiter=';')
+        reader = csv.DictReader(f, delimiter=',')
         for line in reader:
-            data.append(line)
+            database.append(line)
         f.close()
-    agrupamentos = [s for s in data[0].keys() if "Agrup" in s]
-    agrupamentos.sort()
 
-####################################################################
-def getGroupInfo(studentNumber):
-    student = listStudent(studentNumber).pop(0)
-    groupInfo = []
-    for agrupamento in agrupamentos:
-        try:
-            grpid= int(student[agrupamento])
-            groupInfo.append(agrupamento)
-            groupInfo.append(student[agrupamento])
-        except:
-            pass
+    # use these keys only 
+    keys = ['Number', 'Name', 'Group']
 
-    return groupInfo
+    # delete other keys
+    unwanted = set(database[0].keys()) - set(keys)
 
+    for i in range(len(database)):
+        for unwanted_key in unwanted: del database[i][unwanted_key]
 
-####################################################################
-# ls student_number
-####################################################################
-def listStudent(studentNumber):
-    return [student for student in data if student["N\xfamero"] == studentNumber]
+    saveDB()
 
-####################################################################
-# ii item
-####################################################################
-def insertItems(itemList):
-    for student in data:
-        for item in itemList:
-            if not (item in student.keys()):
-                student[item]=''
-
-####################################################################
-# isg item student_number grade
-####################################################################
-def insertStudentGrade (studentGrade):
-
-    if len(studentGrade) != 3:
-        print "\nERROR: Number of fields must be 3\n"
-        return 0
-        
-    item = studentGrade[0]
-    if not (item in data[0].keys()):
-        print "\nERROR: Item does not exist\n"
-        return 0
-
-    grade = studentGrade[2]
-    if not (int(grade) in grader):
-        print "\nERROR: Grade is not in the range "+str(min(grader))+" "+str(max(grader))+"\n"
-        return 0
-
-    student_number = studentGrade[1]    
-    student_list = [ student for student in data if student['N\xfamero'] == student_number ]
-
-    try:
-        student = student_list.pop(0)
-    except:
-        print "\nERROR: Student not found\n"
-        return 1
-
-    student[item] = grade
-    return 0
-
-####################################################################
-# igg item group_member grade
-####################################################################
-def insertGroupGrade (groupGrade):
-
-    if len(groupGrade) != 3:
-        print "\nERROR: Number of fields is not 3\n"
-        return 0
-        
-    item = groupGrade[0]
-    group_member = groupGrade[1]
-    grade = groupGrade[2]
-
-
-    if not (item in data[0].keys()):
-        print "\nERROR: Item does not exist\n"
-        return 0
-
-    if not (int(grade) in grader):
-        print "\nERROR: Grade is not in the range "+str(min(grader))+" "+str(max(grader))+"\n"
-        return 0
-
-    agrupamento, group = getGroupInfo(group_member)
     
-    student_list = [student for student in data if student[agrupamento] == group]
+#
+# Load database
+#
+def loadDB():
+    global eval_items
+    with open('sdb.csv',  'r') as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for line in reader:
+            database.append(line)
+        f.close()
 
-    for student in student_list:
-        student[item] = grade
+    eval_items = [x for x in reader.fieldnames if x not in ['Number','Name','Group']]
 
-    return 1
 
-def insertGroupGrade2 (groupGrade):
+#
+# Reads student grades from file and inserts in database
+#
+def insertStudentGrades (studentGrades_file):
 
-    if len(groupGrade) != 3:
-        print "\nERROR: Number of fields is not 3\n"
-        return 0
+    global eval_items
+    newitems = []
+    
+    # load database
+    loadDB()
+
+    #create student grade dict
+    studentGrades = []
+    with open(studentGrades_file, 'r') as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for line in reader:
+            studentGrades.append(line)
+        f.close()
+
+    #update eval items
+    newitems = reader.fieldnames
+    newitems.remove('Number')
+
+    # insert new items in eval items
+    eval_items.extend([i for i in newitems if i not in eval_items])
+
+    # insert in database
+    for student in studentGrades:
+        for eval_item in newitems:
+            (database[find_index(database, 'Number', student['Number'])])[eval_item]=student[eval_item]
+
+
+    # save database
+    saveDB()
+
+
+
+def insertGroupGrades (groupGrades_file):
+
+    global eval_items
+    newitems = []
+    
+    # load database
+    loadDB()
+    
+    #create group grades dict
+    groupGrades = []
+    with open(groupGrades_file, 'r') as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for line in reader:
+            groupGrades.append(line)
+        f.close()
+
+    #update eval items
+    newitems = reader.fieldnames
+    newitems.remove('Number')
+
+    # insert new items in eval items
+    eval_items.extend([i for i in newitems if i not in eval_items])
+
+    # insert in database
+    for group in groupGrades:
+        student_list = [student for student in database if student['Group'] == group['Number']]
         
-    item = groupGrade[0]
-    group_number = groupGrade[1]
-    grade = groupGrade[2]
+        for student in student_list:
+            for eval_item in newitems:
+                (database[find_index(database, 'Number', student['Number'])])[eval_item]=group[eval_item]
 
+    # save database
+    saveDB()
 
-    if not (item in data[0].keys()):
-        print "\nERROR: Item does not exist\n"
-        return 0
-
-    student_list = [student for student in data if student[agrupamentos[0]] == group_number]
-
-    for student in student_list:
-        student[item] = grade
-
-    return 1
-
-
+#
+# Display program usage
+#
+def usage ():
+    print 'usage: gradmgr --create_db students.csv'
+    print '       gradmgr --insert_s sgrades.csv'
+    print '       gradmgr --insert_g ggrades.csv'
+    
+   
 ####################################################################
 # Main
 ####################################################################
 def main () :
 
-    if(len(sys.argv) != 2):
-        print 'usage: gradmgr infile'
+    if(len(sys.argv) != 3):
+        usage()
         sys.exit(1)
 
-    loadDB(sys.argv[1])
-
-    filename = sys.argv[1].split('.').pop(0)
-
-    while 1:
-        try:
-            cmdline = raw_input("gm> ")
-        except EOFError:
-            print ''
-            break
-
-        cmdline = cmdline.split()
-        cmd = 'NA'
-        try:
-            cmd = cmdline.pop(0)
-        except:
-            pass
-
-        if (cmd[0]=='#' or cmd=='NA'):
-            pass
-        elif cmd=='ls':
-            student = listStudent(cmdline[0])
-            if student:
-                print student.pop(0)
-            
-        elif cmd=='isg':
-            flag = insertStudentGrade(cmdline)
-            if flag == 1:
-                print "Student grade inserted successfully\n"
-            else:
-                print "Could not insert student grade\n"
-        elif cmd=='ii':
-            insertItems(cmdline)
-        elif cmd=='igg':
-            flag = insertGroupGrade(cmdline)
-            if flag == 1:
-                print "Group grade inserted successfully\n"
-            else:
-                print "Could not insert group grade\n"
-        elif cmd=='igg2':
-            flag = insertGroupGrade2(cmdline)
-            if flag == 1:
-                print "Group grade inserted successfully\n"
-            else:
-                print "Could not insert group grade\n"
-        elif cmd=='psg':
-            printStudentGrades(filename+'_sg.csv', cmdline)
-        elif cmd=='pgg':
-            printGroupGrades(filename+'_gg.csv', cmdline)
-        elif cmd=='quit':
-            saveDB(filename)
-            sys.exit(0)
-        else:
-            print 'Command not found'
-                
+    if( sys.argv[1] == '--create_db' ):
+        createDB(sys.argv[2])
+    elif( sys.argv[1] == '--insert_s' ):
+        insertStudentGrades(sys.argv[2])
+    elif( sys.argv[1] == '--insert_g' ):
+        insertGroupGrades(sys.argv[2])
+    else:
+        usage()
+                        
 if __name__ == "__main__" : main ()
 
