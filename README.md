@@ -10,19 +10,19 @@ Written by Jose T. de Sousa (jts@inesc-id.pt)
 
 ### Individual student grades file format
 
-    Number,             EvalItem1, ...,         EvalItemN
-    [student number]    [EvalItem1 grade]       [EvalItemN grade]
-    ...                 ...                     ...
-    [student number]    [EvalItem1 grade]       [EvalItemN grade]
+    Number,              EvalItem1, ...,          EvalItemN
+    [student number],    [EvalItem1 grade],       [EvalItemN grade]
+    ...                  ...                      ...
+    [student number],    [EvalItem1 grade],       [EvalItemN grade]
 
     * Rows do not need to be ordered
 
 ### Group grades file format
 
-    Number,             EvalItem1, ...,         EvalItemN
-    [group number]      [EvalItem1 grade]       [EvalItemN grade]
-    ...                 ...                     ...
-    [group number]      [EvalItem1 grade]       [EvalItemN grade]
+    Number,              EvalItem1, ...,          EvalItemN
+    [group number],      [EvalItem1 grade],       [EvalItemN grade]
+    ...                  ...                      ...
+    [group number],      [EvalItem1 grade],       [EvalItemN grade]
 
     * Rows do not need to be ordered
 
