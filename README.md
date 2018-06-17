@@ -2,13 +2,11 @@
 
 Written by Jose T. de Sousa (jts@inesc-id.pt)
 
-## Make sure you have Python installed. The script has been tested in Python version 2.7.9
+## Make sure you have Python installed. The script has been tested in Python version 2.7.9.
 
+## Go to Fenix and generate the student spreadsheet (for example students.csv). Make sure it contains information on student groups, if you want to insert group grades in all students of the group.
 
-## Go to Fenix and generate the student spreadsheet (for example students.csv). Make sure ut contains information on student gropus, if you want to insert group grades in all students of the group.
-
-
-## Open the spreadsheet and write it out as CSV file in the same directory where you will run grademgr
+## Open the spreadsheet and write it out as a CSV file to the same directory where you will run grademgr.
 
 ## Prepare your grade files
 
@@ -32,25 +30,25 @@ Written by Jose T. de Sousa (jts@inesc-id.pt)
 	    * Rows do not need to be ordered
 
 
-## Run the porgram to generate a database
+## Run the program to generate a database
 
 $ grademgr --create_db students.csv
 
-This creates a database stored in file sdb.csv containing students' number, name and group
+This creates a database stored in file sdb.csv, containing the students' number, name and group.
 
 
-## Run the program to insert individual  grades
+## Run the program to insert individual grades
 
 $ grademgr --insert_s your_students_grades.csv
 
-The new evaluation items in your_students_grades.csv will be added to sdb.csv. Existing items will be updated.
+The new evaluation items in your_students_grades.csv will be added to sdb.csv. Grades for existing items will be updated.
 
 
 ## Run the program to insert group grades
 
 $ grademgr --insert_g your_groups_grades.csv
 
-The new evaluation items in your_students_grades.csv will be added to sdb.csv. Existing items will be updated.
+The new evaluation items in your_students_grades.csv will be added to sdb.csv. Grades for existing items will be updated.
 
 
 * Enjoy and feel free to comment, fix, upgrade, etc.
