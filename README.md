@@ -54,4 +54,3 @@ The new evaluation items in your_students_grades.csv will be added to sdb.csv. E
 
 
 * Enjoy and feel free to comment, fix, upgrade, etc.
-
