@@ -33,8 +33,9 @@ def saveDB():
 
     global eval_items
 
-    with open('sdb.csv', 'wb') as f:
+    with open('sdb.csv', 'w') as f:
         writer = csv.DictWriter(f, ['Number', 'Name', 'Group']+eval_items, delimiter=',')
+        
         writer.writeheader()
         writer.writerows(database)
         f.close()
@@ -155,9 +156,9 @@ def insertGroupGrades (groupGrades_file):
 # Display program usage
 #
 def usage ():
-    print 'usage: gradmgr --create_db students.csv'
-    print '       gradmgr --insert_s sgrades.csv'
-    print '       gradmgr --insert_g ggrades.csv'
+    print('usage: gradmgr --create_db students.csv')
+    print('       gradmgr --insert_s sgrades.csv')
+    print('       gradmgr --insert_g ggrades.csv')
     
    
 ####################################################################
